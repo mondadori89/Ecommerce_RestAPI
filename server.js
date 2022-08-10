@@ -25,6 +25,29 @@ app.get('/', (request, response) => {
 
 app.get('/products', db.getProducts);
 
+app.post('/register', db.createUser);
+
+app.post("/login", db.login);
+
+
+/*
+API Plan:
+
+POST /register - to register user
+POST /login - to login
+
+
+POST new order              to start a new order           
+POST new orders_products    to include products on the order
+GET order                   to get the order sumary
+PUT orders_products         to change the quentity on the products
+DELETE orders_products      to delete products from the order
+
+PUT order                   to change the order status, like after payment
+DELETE/PUT order            to cancel an order
+
+*/
+
 
 
 // set the app to listen on the port you set:
