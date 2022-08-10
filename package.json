@@ -1,0 +1,25 @@
+{
+  "name": "ecommerce_restapi",
+  "version": "1.0.0",
+  "description": "a codecademy backend project",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mondadori89/Ecommerce_RestAPI.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mondadori89/Ecommerce_RestAPI/issues"
+  },
+  "homepage": "https://github.com/mondadori89/Ecommerce_RestAPI#readme",
+  "dependencies": {
+    "express": "^4.18.1",
+    "pg": "^8.7.3"
+  }
+}
