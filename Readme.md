@@ -7,6 +7,11 @@ Must have node installed
 
 `npm init -y` <br />
 `npm i express pg ` <br />
+`npm install express-session ` <br />
+`npm install passport passport-local` <br />
+<br />
+
+`npm start`  - to run it <br />
 <br />
 
 ## Database

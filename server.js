@@ -1,11 +1,31 @@
 const express = require('express');
 const bodyParser = require('body-parser')
 const db = require('./db')
+const session = require("express-session")
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
+const { ensureAuthentication } = require('./login/auth')
 
-
+const store = new session.MemoryStore();
 const app = express();
 const PORT = 4001;
 
+app.use(
+  session({
+    secret: "D53gxl41G",       
+    resave: false,           
+    saveUninitialized: false,          
+    cookie: {                       
+      maxAge: 1000*60*60*24,     
+      secure: true,                
+      sameSite: "none",          
+      },                
+    store,                                  
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(bodyParser.json())
 app.use(
   bodyParser.urlencoded({
@@ -23,18 +43,21 @@ app.get('/', (request, response) => {
 
 // Endpoints:
 
-app.get('/products', db.getProducts);
 
-app.post('/register', db.createUser);
+// User Register and login
+app.post('/register', db.createUser);  // POST { name, email, password } - register a new user  
+app.post('/login', db.login);          // POST { email, password } - login user 
 
-app.post("/login", db.login);
+
+// Products
+
+app.get('/products', /*ensureAuthentication,*/ db.getProducts);  // GET - all Products
+
+
 
 
 /*
 API Plan:
-
-POST /register - to register user
-POST /login - to login
 
 
 POST new order              to start a new order           

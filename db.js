@@ -26,13 +26,13 @@ const getProducts = (request, response) => {
 // POST a new user      /register
 
 const createUser = (request, response) => {
-    const { email, password } = request.body
+    const { name, email, password } = request.body
   
-    pool.query('INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *', [email, password], (error, results) => {
+    pool.query('INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *', [name, email, password], (error, results) => {
       if (error) {
         throw error
       }
-      response.status(201).send(`User added with ID: ${results.rows[0].id}`)
+      response.status(201).json({ msg: `User added with ID: ${results.rows[0].id}` })
     })
 };
 
@@ -40,19 +40,25 @@ const createUser = (request, response) => {
 // POST a new user      /login
 
 const login = (request, response) => {
-    const { email, password } = request.body
-    pool.query('SELECT email, password FROM users WHERE email = $1;', [email], (error, results) => {
-        if (error) {
-          throw error
+  const { email, password } = request.body
+  pool.query('SELECT email, password FROM users WHERE email = $1;', [email], (error, results) => {
+    if (error) {
+      throw error
+    }
+    if (results.rows[0]) {
+      if (email === results.rows[0].email && password === results.rows[0].password) {
+        request.session.authenticated = true;
+        request.session.user = {
+          email,
+          password,
         }
-        if (results.rows[0]) {
-            if (email === results.rows[0].email && password === results.rows[0].password) {
-                response.status(201).send(`Logged in with email: ${results.rows[0].email}`);
-            }
-            else{response.send('No can do... Password is wrong!')}
-        }
-        else {response.send('No can do... No email like that.')}
-    })
+        console.log(request.session);
+        response.status(201).json({ msg: `Logged in with email: ${results.rows[0].email}` });
+      }
+      else{response.status(403).json({ msg: "No can do... Password is wrong!" });}
+    }
+    else{response.status(403).json({ msg: "No can do... No email like that." });}
+  })
 };
 
 
@@ -60,7 +66,8 @@ const login = (request, response) => {
 // Exporting CRUD functions in a REST API
 
 module.exports = {
-    getProducts,
-    createUser,
-    login
+  pool,
+  getProducts,
+  createUser,
+  login
 }
