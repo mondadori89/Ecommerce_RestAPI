@@ -4,6 +4,7 @@ const db = require('./db')
 const session = require("express-session")
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
+const { pool } = require('./db.js')
 const { ensureAuthentication } = require('./login/auth')
 
 const store = new session.MemoryStore();
@@ -24,8 +25,7 @@ app.use(
   })
 );
 
-app.use(passport.initialize());
-app.use(passport.session());
+
 app.use(bodyParser.json())
 app.use(
   bodyParser.urlencoded({
@@ -37,6 +37,7 @@ app.use(
 // Route to main page:
 
 app.get('/', (request, response) => {
+    console.log(pool);
     response.json({ info: 'E-commerce RestAPI On! NodeJS, Express, and Postgres API' })
 })
 
@@ -51,8 +52,7 @@ app.post('/login', db.login);          // POST { email, password } - login user
 
 // Products
 
-app.get('/products', /*ensureAuthentication,*/ db.getProducts);  // GET - all Products
-
+app.get('/products', ensureAuthentication, db.getProducts);  // GET - all Products
 
 
 
@@ -78,3 +78,42 @@ DELETE/PUT order            to cancel an order
 app.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}`);
 });
+
+
+
+
+
+
+/*
+// Passport:
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser((user, done) => {     
+    done(null, user.id);
+});
+
+passport.deserializeUser((id, done) => {
+    pool.query('SELECT id, email, password FROM users WHERE id = $1;', [id], function(err, results) {
+      if (err) return done(err);
+      done(null, results.rows[0]);
+    });
+});
+
+passport.use(new LocalStrategy(function verify(email, password, done) {
+  pool.query('SELECT email, password FROM users WHERE email = $1;', [ email ], function(err, results) {
+    if (err) return done(err);
+    if (!results) return done(null, false, { msg: 'Incorrect email or password.' }); 
+    if (results.rows[0].password !== password) return done(null, false, { msg: 'Incorrect email or password.' });
+    return done(null, results.rows[0]);
+    });
+}));
+
+app.post(
+  '/login',
+  passport.authenticate('local', { failureRedirect : '/login' }),
+  (req, res) => {
+    res.status(201).json({ msg: `Logged in`});
+  }
+);
+*/

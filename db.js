@@ -26,14 +26,21 @@ const getProducts = (request, response) => {
 // POST a new user      /register
 
 const createUser = (request, response) => {
-    const { name, email, password } = request.body
-  
-    pool.query('INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *', [name, email, password], (error, results) => {
-      if (error) {
-        throw error
-      }
-      response.status(201).json({ msg: `User added with ID: ${results.rows[0].id}` })
-    })
+  const { name, email, password } = request.body
+  pool.query('SELECT email FROM users WHERE email = $1;', [email], (error, results) => {
+    if (error) {
+      throw error
+    }
+    if (!results.rows[0]) {
+      pool.query('INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *', [name, email, password], (error, userInserted) => {
+        if (error) {
+          throw error
+        }
+        response.status(201).json({ msg: `User added with ID: ${userInserted.rows[0].id}` })
+      });
+    }
+    else {response.status(403).json({ msg: "No can do... Email already exists" });}
+  });
 };
 
 
