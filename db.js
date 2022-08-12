@@ -14,7 +14,6 @@ const pool = new Pool({
 
 
 
-
 // GET all Products        /products 
 
 const getProducts = (request, response) => {

@@ -15,13 +15,14 @@ authRouter.post('/login', (request, response) => {
       }
       if (results.rows[0]) {
         if (email === results.rows[0].email && password === results.rows[0].password) {
-          request.session.authenticated = true;
-          request.session.user = {
-            email,
-            password,
-          }
-          console.log(request.session);
-          response.status(201).json({ msg: `Logged in with email: ${results.rows[0].email}` });
+            request.session.authenticated = true;
+            request.session.user = {
+                email,
+                password,
+            }
+            console.log(request.session);
+            response.cookie(request.session.authenticated);
+            response.status(201).json({ msg: `Logged in with email: ${results.rows[0].email}` });
         }
         else{response.status(403).json({ msg: "No can do... Password is wrong!" });}
       }

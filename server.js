@@ -45,32 +45,18 @@ app.get('/', (request, response) => {
 
 
 // Routes:
-// User Register and login
 
+// User Register and login
 app.use('/auth', authRouter);
 
+// Orders
+app.use('/auth', ordersRouter);
 
+// Users
+//app.use('/auth', ordersRouter);  // GET user by ID, PUT Address
 
 // Products
-
 app.get('/products', ensureAuthentication, db.getProducts);  // GET - all Products
-
-
-
-/*
-API Plan:
-
-
-POST new order              to start a new order           
-POST new orders_products    to include products on the order
-GET order                   to get the order sumary
-PUT orders_products         to change the quentity on the products
-DELETE orders_products      to delete products from the order
-
-PUT order                   to change the order status, like after payment
-DELETE/PUT order            to cancel an order
-
-*/
 
 
 

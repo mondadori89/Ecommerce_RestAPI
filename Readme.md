@@ -5,10 +5,9 @@ A codecademy backend project.
 ## Install npm, express and postgres
 Must have node installed
 
-`npm init -y` <br />
 `npm i express pg ` <br />
 `npm install express-session ` <br />
-`npm install passport passport-local` <br />
+`npm install passport passport-local` -> not really need yet<br /> 
 <br />
 
 `npm start`  - to run it <br />
