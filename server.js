@@ -4,8 +4,10 @@ const db = require('./db')
 const session = require("express-session")
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
-const { pool } = require('./db.js')
-const { ensureAuthentication } = require('./login/auth')
+const { ensureAuthentication } = require('./routes/auth_helper')
+
+const authRouter = require('./routes/auth.js');
+
 
 const store = new session.MemoryStore();
 const app = express();
@@ -42,12 +44,11 @@ app.get('/', (request, response) => {
 })
 
 
-// Endpoints:
-
-
+// Routes:
 // User Register and login
-app.post('/register', db.createUser);  // POST { name, email, password } - register a new user  
-app.post('/login', db.login);          // POST { email, password } - login user 
+
+app.use('/auth', authRouter);
+
 
 
 // Products

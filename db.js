@@ -12,6 +12,9 @@ const pool = new Pool({
 });
 
 
+
+
+
 // GET all Products        /products 
 
 const getProducts = (request, response) => {
@@ -23,51 +26,6 @@ const getProducts = (request, response) => {
     })
 };
 
-// POST a new user      /register
-
-const createUser = (request, response) => {
-  const { name, email, password } = request.body
-  pool.query('SELECT email FROM users WHERE email = $1;', [email], (error, results) => {
-    if (error) {
-      throw error
-    }
-    if (!results.rows[0]) {
-      pool.query('INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *', [name, email, password], (error, userInserted) => {
-        if (error) {
-          throw error
-        }
-        response.status(201).json({ msg: `User added with ID: ${userInserted.rows[0].id}` })
-      });
-    }
-    else {response.status(403).json({ msg: "No can do... Email already exists" });}
-  });
-};
-
-
-// POST a new user      /login
-
-const login = (request, response) => {
-  const { email, password } = request.body
-  pool.query('SELECT email, password FROM users WHERE email = $1;', [email], (error, results) => {
-    if (error) {
-      throw error
-    }
-    if (results.rows[0]) {
-      if (email === results.rows[0].email && password === results.rows[0].password) {
-        request.session.authenticated = true;
-        request.session.user = {
-          email,
-          password,
-        }
-        console.log(request.session);
-        response.status(201).json({ msg: `Logged in with email: ${results.rows[0].email}` });
-      }
-      else{response.status(403).json({ msg: "No can do... Password is wrong!" });}
-    }
-    else{response.status(403).json({ msg: "No can do... No email like that." });}
-  })
-};
-
 
 
 // Exporting CRUD functions in a REST API
@@ -75,6 +33,4 @@ const login = (request, response) => {
 module.exports = {
   pool,
   getProducts,
-  createUser,
-  login
 }
