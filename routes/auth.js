@@ -22,7 +22,7 @@ authRouter.post('/login', (request, response) => {
             }
             console.log(request.session);
             response.cookie(request.session.authenticated);
-            response.status(201).json({ msg: `Logged in with email: ${results.rows[0].email}` });
+            response.status(201).json({ msg: `Logged in with email: ${results.rows[0].email} and id: ${results.rows[0].id}` });
         }
         else{response.status(403).json({ msg: "No can do... Password is wrong!" });}
       }

@@ -7,6 +7,7 @@ const LocalStrategy = require("passport-local").Strategy;
 const { ensureAuthentication } = require('./routes/auth_helper')
 
 const authRouter = require('./routes/auth.js');
+const ordersRouter = require('./routes/orders.js');
 
 
 const store = new session.MemoryStore();
@@ -50,13 +51,13 @@ app.get('/', (request, response) => {
 app.use('/auth', authRouter);
 
 // Orders
-app.use('/auth', ordersRouter);
+app.use('/orders', ordersRouter);
 
 // Users
-//app.use('/auth', ordersRouter);  // GET user by ID, PUT Address
+//app.use('/user', userRouter);  // GET user by ID, PUT Address
 
 // Products
-app.get('/products', ensureAuthentication, db.getProducts);  // GET - all Products
+app.get('/products', /*ensureAuthentication,*/ db.getProducts);  // GET - all Products
 
 
 
