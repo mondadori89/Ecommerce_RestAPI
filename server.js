@@ -4,7 +4,7 @@ const db = require('./db')
 const session = require("express-session")
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
-const { ensureAuthentication } = require('./routes/auth_helper')
+const { ensureAuthentication } = require('./routes/auth_helpers')
 
 const authRouter = require('./routes/auth.js');
 const ordersRouter = require('./routes/orders.js');

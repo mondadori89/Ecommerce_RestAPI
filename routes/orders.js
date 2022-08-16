@@ -1,5 +1,6 @@
 const express = require('express');
-const db = require('../db.js')
+const db = require('../db.js');
+const { updateStock }= require('./orders_helpers.js');
 
 
 const ordersRouter = express.Router();
@@ -39,32 +40,83 @@ ordersRouter.post('/new-order', (request, response) => {
 
 
 // POST new orders_products    to include products on the order / get product id, order id, set quantity
-ordersRouter.post('/add-product', (request, response) => {
+ordersRouter.post('/add-product', async (request, response) => {
     const { order_id, product_id, product_quantity } = request.body;
-    db.pool.query(
-        'INSERT INTO orders_products (order_id, product_id, product_quantity) VALUES ($1, $2, $3) RETURNING *;',
-        [order_id, product_id, product_quantity],
-        (error, productInserted) => {
+
+    await db.pool.query(
+        'SELECT name, quantity FROM products WHERE id = $1;',
+        [product_id],
+        (error, results) => {
             if (error) {
               throw error
             }
-            response.status(201).json(productInserted.rows[0])
+            const productName = results.rows[0].name;
+
+            const productStock = results.rows[0].quantity;
+
+            if (product_quantity <= productStock) {
+                db.pool.query(
+                    'INSERT INTO orders_products (order_id, product_id, product_quantity) VALUES ($1, $2, $3) RETURNING *;',
+                    [order_id, product_id, product_quantity],
+                    (error, productInserted) => { if (error) { throw error } }
+                );
+                
+                const stockLeft = productStock - product_quantity;
+
+                updateStock(product_id, stockLeft);
+
+                response.status(201).json({ msg: `${product_quantity} ${productName}(s) added to your cart and ${stockLeft} left on stock.`})
+
+            } else { response.status(201).json({ msg: `Not enought on stock.`}) }
+        }
+    );   
+});
+
+
+// PUT orders_products         to change the quantity on the products
+ordersRouter.put('/:id/change-product', (request, response) => {
+    const order_id = request.params.id;
+    const { product_id, product_quantity } = request.body;
+    db.pool.query(
+        'UPDATE orders_products SET product_quantity = $3 WHERE order_id = $1 AND product_id = $2;',
+        [order_id, product_id, product_quantity],
+        (error, results) => {
+            if (error) { throw error }
+            response.status(201).json({ msg: `Order with Id ${order_id} updated.`})
         }
     );
 });
 
 
+// DELETE orders_products      to delete products from the order
+ordersRouter.delete('/:id/:product_id', (request, response) => {
+    const order_id = request.params.id;
+    const product_id = request.params.product_id;
+    db.pool.query(
+        'DELETE FROM orders_products WHERE order_id = $1 AND product_id = $2;',
+        [order_id, product_id],
+        (error, results) => {
+            if (error) { throw error }
+            response.status(201).json({ msg: `Item with Id ${product_id} deleted from Order ${order_id}.`})
+        }
+    );
+});
 
-/*
-API Plan:
 
-PUT orders_products         to change the quantity on the products
-DELETE orders_products      to delete products from the order
+// PUT order             to change the order status (Paid, Canceled, Delivered), like after payment or if you cancel the order.
+ordersRouter.put('/:id', (request, response) => {
+    const id = request.params.id;
+    const { status } = request.body;
+    db.pool.query(
+        'UPDATE orders SET status = $2 WHERE id = $1;', 
+        [id, status], 
+        (error, results) => {
+            if (error) { throw error }
+            response.status(200).json({ msg: `Order ${id} updated with status: ${status}.`})
+        }
+    )
+});
 
-PUT order                   to change the order status, like after payment
-DELETE/PUT order            to cancel an order
-
-*/
 
 
 
