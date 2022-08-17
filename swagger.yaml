@@ -1,0 +1,358 @@
+openapi: 3.0.1
+info:
+  title: Ecommerce RestAPI
+  version: '1.0'
+  description: Codecademy Ecommerce RestAPI Project
+paths:
+  /products:
+    summary: Get all products
+    get:
+      summary: Get all products
+      description: ''
+      operationId: ''
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              examples:
+                List of all products:
+                  value: |-
+                    [
+                        {
+                            "id": 1,
+                            "name": "Hammer",
+                            "category": "Tools",
+                            "price": "R$ 15,99",
+                            "quantity": 4
+                        },
+                        {
+                            "id": 2,
+                            "name": "Nails",
+                            "category": "Nails & screws",
+                            "price": "R$ 5,65",
+                            "quantity": 20
+                        },
+                        {
+                            "id": 3,
+                            "name": "Screws",
+                            "category": "Nails & screws",
+                            "price": "R$ 8,25",
+                            "quantity": 9
+                        }
+                    ]
+      tags:
+        - Products
+  /auth/login:
+    summary: Login
+    post:
+      summary: To login into the aplication
+      description: ''
+      operationId: ''
+      requestBody:
+        description: A JSON object containing email and password
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/Login'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              examples:
+                Login success:
+                  value: |-
+                    {
+                        "msg": "Logged in with email: contato@gmail.com and id: 10"
+                    }
+        default:
+          description: Default error sample response
+      tags:
+        - Auth
+  /auth/register:
+    summary: Register a new user
+    post:
+      summary: Register a new user
+      description: ''
+      operationId: ''
+      requestBody:
+        description: A JSON object containing name, email and password
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/Register'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              examples:
+                Login success:
+                  value: |-
+                    {
+                        "msg": "User added with ID: 12"
+                    }
+        default:
+          description: Default error sample response
+      tags:
+        - Auth
+  /orders/{id}:
+    summary: Orders by id
+    get:
+      summary: Get the order summary by the order id
+      description: ''
+      parameters:
+        - name: id
+          in: path
+          description: ID of the order
+          required: true
+          schema:
+            type: integer
+            format: int64
+      operationId: ''
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              examples:
+                Order summary example:
+                  value: |-
+                    [
+                        {
+                            "id": 2,
+                            "name": "Nails",
+                            "price": "R$ 5,65",
+                            "product_quantity": 6,
+                            "status": "Canceled"
+                        },
+                        {
+                            "id": 1,
+                            "name": "Hammer",
+                            "price": "R$ 15,99",
+                            "product_quantity": 3,
+                            "status": "Canceled"
+                        }
+                    ]
+        default:
+          description: Default error sample response
+      tags:
+        - Orders
+    put:
+      summary: Change Status of an order
+      description: ''
+      parameters:
+        - name: id
+          in: path
+          description: ID of the order
+          required: true
+          schema:
+            type: integer
+            format: int64
+      operationId: ''
+      requestBody:
+        description: A JSON object containing the new status of the order
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/Change-status'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              examples:
+                Status changed:
+                  value: |-
+                    {
+                        "msg": "Order 4 updated with status: Delivered."
+                    }
+        default:
+          description: Default error sample response
+      tags:
+        - Orders
+  /orders/new-order:
+    summary: Set up a new order
+    post:
+      summary: Set up a new order
+      description: ''
+      operationId: ''
+      requestBody:
+        description: A JSON object containing the user id
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/New-order'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              examples:
+                New order:
+                  value: |-
+                    {
+                        "id": 17,
+                        "user_id": 1,
+                        "status": "Pending"
+                    }
+        default:
+          description: Default error sample response
+      tags:
+        - Orders
+  /orders/add-product:
+    summary: Add new product to an order
+    post:
+      summary: Add a new product to an order
+      description: ''
+      operationId: ''
+      requestBody:
+        description: A JSON object containing the product and quantity to add to an order
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/Add-product'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              examples:
+                Quantity on stock:
+                  value: |-
+                    {
+                        "msg": "1 Hammer(s) added to your cart and 4 left on stock."
+                    }
+                Not enought on stock:
+                  value: |-
+                    {
+                        "msg": "Not enought on stock."
+                    }
+        default:
+          description: Default error sample response
+      tags:
+        - Orders
+  /orders/{id}/change-product:
+    summary: Change an order
+    put:
+      summary: Change the quantity of a product on an order
+      description: ''
+      parameters:
+        - name: id
+          in: path
+          description: ID of the order
+          required: true
+          schema:
+            type: integer
+            format: int64
+      operationId: ''
+      requestBody:
+        description: >-
+          A JSON object containing the product and quantity to change on an
+          order
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/Change-product'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              examples:
+                Quantity on stock:
+                  value: |-
+                    {
+                        "msg": "Order with Id 15 updated."
+                    }
+        default:
+          description: Default error sample response
+      tags:
+        - Orders
+  /orders/{id}/{product_id}:
+    summary: A product within an order
+    delete:
+      summary: Delete a product from an order
+      description: ''
+      parameters:
+        - name: id
+          in: path
+          description: ID of the order
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: product_id
+          in: path
+          description: ID of the product
+          required: true
+          schema:
+            type: integer
+            format: int64
+      operationId: ''
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              examples:
+                Deletion done:
+                  value: |-
+                    {
+                        "msg": "Item with Id 2 deleted from Order 16."
+                    }
+        default:
+          description: Default error sample response
+      tags:
+        - Orders
+components:
+  schemas:
+    Login:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    Register:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+    New-order:
+      type: object
+      properties:
+        user_id:
+          type: integer
+    Add-product:
+      type: object
+      properties:
+        order_id:
+          type: integer
+        product_id:
+          type: integer
+        product_quantity:
+          type: integer
+    Change-product:
+      type: object
+      properties:
+        product_id:
+          type: integer
+        product_quantity_added:
+          type: integer
+    Change-status:
+      type: object
+      properties:
+        status:
+          type: string
