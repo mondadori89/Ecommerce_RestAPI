@@ -9,7 +9,7 @@ const authRouter = express.Router();
 
 authRouter.post('/login', (request, response) => {
     const { email, password } = request.body
-    db.pool.query('SELECT email, password FROM users WHERE email = $1;', [email], (error, results) => {
+    db.pool.query('SELECT id, email, password FROM users WHERE email = $1;', [email], (error, results) => {
       if (error) {
         throw error
       }
