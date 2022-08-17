@@ -76,13 +76,24 @@ ordersRouter.post('/add-product', async (request, response) => {
 // PUT orders_products         to change the quantity on the products
 ordersRouter.put('/:id/change-product', (request, response) => {
     const order_id = request.params.id;
-    const { product_id, product_quantity } = request.body;
+    const { product_id, product_quantity_added } = request.body;
+
     db.pool.query(
-        'UPDATE orders_products SET product_quantity = $3 WHERE order_id = $1 AND product_id = $2;',
-        [order_id, product_id, product_quantity],
+        'SELECT order_id, product_id, product_quantity FROM orders_products WHERE order_id = $1 AND product_id = $2;',
+        [order_id, product_id],
         (error, results) => {
             if (error) { throw error }
-            response.status(201).json({ msg: `Order with Id ${order_id} updated.`})
+            const productQuantityOnOrder = results.rows[0].product_quantity;
+            const newProductQuantityOnOrder = productQuantityOnOrder + product_quantity_added
+
+            db.pool.query(
+                'UPDATE orders_products SET product_quantity = $3 WHERE order_id = $1 AND product_id = $2;',
+                [order_id, product_id, newProductQuantityOnOrder],
+                (error, results) => {
+                    if (error) { throw error }
+                    response.status(201).json({ msg: `Order with Id ${order_id} updated.`})
+                }
+            );
         }
     );
 });
