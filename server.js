@@ -12,7 +12,7 @@ const ordersRouter = require('./routes/orders.js');
 
 const store = new session.MemoryStore();
 const app = express();
-const PORT = 4001;
+const PORT = process.env.PORT || 4001;
 
 app.use(
   session({
